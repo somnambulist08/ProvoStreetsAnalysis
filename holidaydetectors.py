@@ -1,4 +1,5 @@
 import datetime
+import json
 import requests
 
 def xthydayofmonth(today,day,number): #takes Date, day(0 = Mon, 6 = Sun), number in month 1-5
@@ -56,5 +57,23 @@ def blackoutdates(start,end):
                     elif today.day == 31 and today.weekday() == 4:
                         span = span-1
             if spanold == span: #check for weather
+                temp = gettemp(today)
+                if temp<32 or temp >95 :#32F is too cold, 95F is too hot
+                    span = span-1
     return span
+
+
+def gettemp(day): #Gets the measured temp from NOAA's provo station on given day
+    url = 'https://www.ncei.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&datatypeid=TOBS&stationid=GHCND:USC00427064&units=standard'
+    token = {'token': 'GThBfAlDCLbufAjUwCwChyWGIKKwGltF'}
+    daterange = {'startdate':day.isoformat(),'enddate':day.isoformat()}
+    r = requests.get(url,headers=token,params=daterange)
+    out = r.json()['results'][-1]
+    return out['value']
+    
+    
+
+
+
+
             
